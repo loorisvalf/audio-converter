@@ -1,0 +1,3 @@
+This add-on is using the compiled version of FFmpeg library using Emscripten.
+
+ffmpeg-all-codecs.js: https://raw.githubusercontent.com/sopel39/audioconverter.js/master/site/js/ffmpeg.js
