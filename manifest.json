@@ -1,9 +1,8 @@
 {
-  "version": "0.1.4",
+  "version": "0.1.5",
   "manifest_version": 3,
   "offline_enabled": true,
   "name": "Audio Converter",
-  "short_name": "audio-converter",
   "permissions": ["storage", "contextMenus"],
   "homepage_url": "https://mybrowseraddon.com/audio-converter.html",
   "description": "Convert any audio file to selected formats (i.e. mp3) inside your browser!",
