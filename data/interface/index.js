@@ -1,38 +1,24 @@
 var config = {
-  "running": false,
-  "audio": {
-    "data": null
-  },
-  "output": {
-    "src": null
-  },
-  "reader": {
-    "audio": new FileReader()
-  },
-  "file": {
-    "audio": null, 
-    "output": null
-  },
   "nohandler": function (e) {
-    e.preventDefault()
+    e.preventDefault();
   },
   "addon": {
     "homepage": function () {
       return chrome.runtime.getManifest().homepage_url;
     }
   },
+  "ffmpeg": {
+    "URL": {
+      "base": chrome.runtime.getURL("/data/interface/vendor/"),
+      "core": chrome.runtime.getURL("/data/interface/vendor/ffmpeg-core.js"),
+      "wasm": chrome.runtime.getURL("/data/interface/vendor/ffmpeg-core.wasm")
+    },
+  },
   "prevent": {
     "scroll": false,
     "drop": function (e) {
       if (e.target.id.indexOf("-fileio") !== -1) return;
       e.preventDefault();
-    }
-  },
-  "loadend": {
-    "audio": function (e) {
-      var arraybuffer = e.target.result;
-      if (arraybuffer) config.audio.data = new Uint8Array(arraybuffer);
-      config.loader.stop();
     }
   },
   "size": function (s) {
@@ -43,69 +29,13 @@ var config = {
       return s + "B";
     } else return '';
   },
-  "element": {
-    "file": null,
-    "input": null,
-    "output": null,
-    "loader": null,
-    "command": null,
-    "preview": null,
-    "info": {"audio": null},
-    "drop": {"audio": null}
-  },
-  "loadfile": function () {
-    config.element.drop.audio.addEventListener("change", function (e) {
-      if (e.target && e.target.files) {
-        if (e.target.files.length && e.target.files[0]) {
-          var file = e.target.files[0];
-          config.loader.start();
-          config.file.audio = file;
-          config.reader.audio.readAsArrayBuffer(config.file.audio);
-          config.element.info.audio.textContent = config.size(config.file.audio.size);
-        }
-      }
-    }, false);
-  },
-  "loader": {
-    "stop": function () {
-      config.running = false;
-      config.element.loader.style.display = "none";
-      config.element.run.removeAttribute("running");
-    },
-    "start": function () {
-      config.running = true;
-      config.create.output.player("none");
-      config.element.open.style.display = "none";
-      config.element.loader.style.display = "block";
-      config.element.download.style.display = "none";
-      config.element.run.setAttribute("running", '');
-    }
-  },
-  "download": function () {
-    var a = document.querySelector('a');
-    if (!a) {
-      var src = config.create.output.src();
-      if (src) {
-        a = document.createElement('a');
-        a.textContent = config.create.output.name;
-        a.download = config.create.output.name;
-        a.style.display = "none";
-        a.href = src;
-        a.click();
-        window.setTimeout(function () {
-          a.remove();
-          URL.revokeObjectURL(config.create.output.blob);
-        }, 1000);
-      }
-    }
-  },
   "resize": {
     "timeout": null,
     "method": function () {
       if (config.port.name === "win") {
         if (config.resize.timeout) window.clearTimeout(config.resize.timeout);
         config.resize.timeout = window.setTimeout(async function () {
-          var current = await chrome.windows.getCurrent();
+          const current = await chrome.windows.getCurrent();
           /*  */
           config.storage.write("interface.size", {
             "top": current.top,
@@ -121,7 +51,7 @@ var config = {
     "name": '',
     "connect": function () {
       config.port.name = "webapp";
-      var context = document.documentElement.getAttribute("context");
+      const context = document.documentElement.getAttribute("context");
       /*  */
       if (chrome.runtime) {
         if (chrome.runtime.connect) {
@@ -153,7 +83,7 @@ var config = {
     "write": function (id, data) {
       if (id) {
         if (data !== '' && data !== null && data !== undefined) {
-          var tmp = {};
+          let tmp = {};
           tmp[id] = data;
           config.storage.local[id] = data;
           chrome.storage.local.set(tmp, function () {});
@@ -164,203 +94,342 @@ var config = {
       }
     }
   },
-  "command": {
-    "clear": function () {
-      config.create.output.player("none");
-      config.element.output.textContent = '';
-      config.element.open.style.display = "none";
-      config.element.download.style.display = "none";
-    },
-    "parse": function (text) {
-      text = text.replace(/\s+/g, ' ');
-      var args = [];
-      text.split('"').forEach(function(t, i) {
-        t = t.trim();
-        if ((i % 2) === 1) args.push(t);
-        else args = args.concat(t.split(" "));
-      });
-      return args;
-    },
-    "run": function (command) {
-      if (!config.running && config.worker.ready) {
-        config.loader.start();
-        config.command.clear();
-        /*  */
-        var args = config.command.parse(command);
-        var files = [{"name": "input", "buffer": config.audio.data}];
-        var audio = config.audio.data && config.audio.data.byteLength;
-        var options = audio ? {"type": "command", "arguments": args, "files": files} : {"type": "command", "arguments": args};
-        /*  */
-        config.worker.element.postMessage(options);
-      }
-    }
-  },
-  "create": {
-    "output": {
-      "ext": null,
-      "blob": null,
-      "name": null,
-      "data": null,
-      "src": function () {
-        var data = config.file.output.data;
-        var name = config.file.output.name;
-        var ext = name.split('.').length ? name.split('.')[1] : null;
-        if (ext) {
-          config.create.output.ext = ext;
-          config.create.output.name = name;
-          config.create.output.data = data;
-          config.create.output.blob = new Blob([data], {"type": "audio/" + ext});
-          return URL.createObjectURL(config.create.output.blob);
-        }
-        /*  */
-        return null;
-      },
-      "player": function (display) {
-        config.element.preview.style.display = display;
-        if (config.element.preview.children[1]) config.element.preview.children[1].remove();
-        /*  */
-        if (display === "block" && config.file.output) {
-          var audio = document.createElement("audio");
-          audio.setAttribute("controls", "controls");
-          audio.setAttribute("preload", "metadata");
-          config.element.preview.appendChild(audio);
-          /*  */
-          config.element.preview.children[1].src = config.output.src;
-        }
-      }
-    }
-  },
-  "worker": {
-    "ready": false,
-    "element": null,
-    "init": async function () {
-      if (config.worker.element) config.worker.element.terminate();
-      /*  */
-      var context = document.documentElement.getAttribute("context");
-      var url = chrome.runtime.getURL("/data/interface/resources/worker.js");
-      /*  */
-      if (context === "webapp") {
-        var response = await fetch(url);
-        var responsecode = await response.text();
-        var responseblob = new Blob([responsecode], {"type": "text/javascript"});
-        /*  */
-        config.worker.element = new Worker(URL.createObjectURL(responseblob));  
-        config.worker.element.postMessage({
-          "type": "import", 
-          "path": chrome.runtime.getURL("/data/interface/vendor/")
-        });
-      } else {
-        config.worker.element = new Worker(url);
-        config.worker.element.postMessage({
-          "path": '',
-          "type": "import"
-        });
-      }
-      /*  */
-      config.worker.element.onmessage = function (e) {
-        var message = e.data;
-        if (message.type === "start") {
-          config.element.output.textContent = "Audio Converter received a command.\n\n";
-        } else if (message.type === "stdout") {
-          config.element.output.textContent += message.data + "\n";
-          if (config.prevent.scroll === false) config.element.output.scrollTop = config.element.output.scrollHeight || 0;
-        } else if (message.type === "ready") {
-          config.loader.stop();
-          config.worker.ready = true;
-          config.element.output.textContent = "Audio Converter is ready!\n\nPlease type a command (i.e. -help) in the above field and then click on the - Run - button to start.\nAlternatively, you can click on a sample command above to insert one into the above input filed.\nThen, click on the - Run - button on the right side to execute your command.\nIf you want to clear the console, please click on the - Clear - button.";
-        } else if (message.type === "done") {
-          config.loader.stop();
-          var output = Object.keys(message.data.outputFiles);
-          if (message.data.code === 0 && output.length) {
-            config.file.output = {"name": output[0], "data": message.data.outputFiles[output[0]]};
-            if (config.file.output) {
-              config.output.src = config.create.output.src();
-              if (config.output.src) {
-                config.element.open.style.display = "inline-block";
-                config.element.download.style.display = "inline-block";
-                /*  */
-                window.setTimeout(function () {
-                  config.create.output.player("block");
-                }, 300);
-              }
-            }
-          }
-        }
-      };
-    }
-  },
   "load": function () {
-    var reload = document.getElementById("reload");
-    var support = document.getElementById("support");
-    var donation = document.getElementById("donation");
-    var actions = [...document.querySelectorAll(".action")];
+    const reload = document.getElementById("reload");
+    const support = document.getElementById("support");
+    const donation = document.getElementById("donation");
+    const actions = [...document.querySelectorAll(".action")];
     /*  */
-    config.element.run = document.querySelector(".run");
-    config.element.clear = document.querySelector(".clear");
-    config.element.input = document.querySelector("#input");
-    config.element.open = document.querySelector(".preview");
-    config.element.output = document.querySelector("#output");
-    config.element.loader = document.querySelector("#loader");
-    config.element.preview = document.querySelector("#preview");
-    config.element.download = document.querySelector(".download");
-    config.element.drop.audio = document.getElementById("audio-fileio");
-    config.element.info.audio = document.getElementById("audio-fileinfo");
+    config.app.element.run = document.querySelector(".run");
+    config.app.element.clear = document.querySelector(".clear");
+    config.app.element.input = document.querySelector("#input");
+    config.app.element.open = document.querySelector(".preview");
+    config.app.element.output = document.querySelector("#output");
+    config.app.element.loader = document.querySelector("#loader");
+    config.app.element.preview = document.querySelector("#preview");
+    config.app.element.download = document.querySelector(".download");
+    config.app.element.drop.audio = document.getElementById("audio-fileio");
+    config.app.element.info.audio = document.getElementById("audio-fileinfo");
     /*  */
-    config.loadfile();
-    config.worker.init();
+    config.app.worker.init();
+    config.app.listener.fileio();
     /*  */
-    config.element.download.addEventListener("click", config.download);
-    config.reader.audio.addEventListener("loadend", config.loadend.audio, false);
-    config.element.open.addEventListener("click", function () {config.create.output.player("block")});
-    config.element.preview.children[0].addEventListener("click", function () {config.create.output.player("none")});
-    config.element.output.addEventListener("scroll", function () {config.prevent.scroll = config.element.output.scrollHeight - config.element.output.clientHeight > config.element.output.scrollTop + 1});
+    config.app.element.download.addEventListener("click", config.app.download);
+    config.app.file.reader.addEventListener("loadend", config.app.listener.loadend);
+    config.app.element.output.addEventListener("scroll", config.app.listener.scroll);
+    config.app.element.open.addEventListener("click", function () {config.app.create.output.player("block")});
+    config.app.element.preview.children[0].addEventListener("click", function () {config.app.create.output.player("none")});
     /*  */
     reload.addEventListener("click", function () {
       document.location.reload();
     });
     /*  */
-    config.element.clear.addEventListener("click", function () {
-      config.command.clear();
+    config.app.element.clear.addEventListener("click", function () {
+      config.app.command.clear();
     });
     /*  */
-    config.element.run.addEventListener("click", function () {
-      config.command.run(config.element.input.value);
+    config.app.element.run.addEventListener("click", function () {
+      config.app.command.run(config.app.element.input.value);
     });
     /*  */
-    config.element.input.addEventListener("keydown", function (e) {
+    config.app.element.input.addEventListener("keydown", function (e) {
       if (e.keyCode === 13) {
-        config.command.run(config.element.input.value);
+        config.app.command.run(config.app.element.input.value);
       }
     }, false);
     /*  */
     actions.forEach(function (action) {
       action.addEventListener("click", function (e) {
-        var command = e.target.getAttribute("data-command");
-        config.element.input.value = command;
+        const command = e.target.getAttribute("data-command");
+        config.app.element.input.value = command;
       });
     });
     /*  */
     support.addEventListener("click", function () {
       if (config.port.name !== "webapp") {
-        var url = config.addon.homepage();
+        const url = config.addon.homepage();
         chrome.tabs.create({"url": url, "active": true});
       }
     }, false);
     /*  */
     donation.addEventListener("click", function () {
       if (config.port.name !== "webapp") {
-        var url = config.addon.homepage() + "?reason=support";
+        const url = config.addon.homepage() + "?reason=support";
         chrome.tabs.create({"url": url, "active": true});
       }
     }, false);
     /*  */
     window.removeEventListener("load", config.load, false);
+  },
+  "app": {
+    "running": false,
+    "audio": {
+      "src": null,
+      "data": null,
+      "buffer": null
+    },
+    "file": {
+      "input": {},
+      "output": {},
+      "reader": new FileReader()
+    },
+    "element": {
+      "file": null,
+      "input": null,
+      "output": null,
+      "loader": null,
+      "command": null,
+      "preview": null,
+      "info": {
+        "audio": null
+      },
+      "drop": {
+        "audio": null
+      }
+    },
+    "loader": {
+      "stop": function (loc) {
+        config.app.running = false;
+        config.app.element.loader.style.display = "none";
+        config.app.element.run.removeAttribute("running");
+      },
+      "start": function () {
+        config.app.running = true;
+        config.app.create.output.player("none");
+        config.app.element.open.style.display = "none";
+        config.app.element.loader.style.display = "block";
+        config.app.element.download.style.display = "none";
+        config.app.element.run.setAttribute("running", '');
+      }
+    },
+    "download": function () {
+      let a = document.querySelector('a');
+      if (!a) {
+        const src = config.app.create.output.src();
+        if (src) {
+          a = document.createElement('a');
+          a.textContent = config.app.create.output.name;
+          a.download = config.app.create.output.name;
+          a.style.display = "none";
+          a.href = src;
+          a.click();
+          /*  */
+          window.setTimeout(function () {
+            a.remove();
+            URL.revokeObjectURL(config.app.create.output.blob);
+          }, 1000);
+        }
+      }
+    },
+    "listener": {
+      "scroll": function () {
+        config.prevent.scroll = config.app.element.output.scrollHeight - config.app.element.output.clientHeight > config.app.element.output.scrollTop + 1;
+      },
+      "loadend": function (e) {
+        config.app.loader.stop(1);
+        config.app.audio.buffer = e.target.result;
+        if (config.app.audio.buffer) {
+          const size = config.size(config.app.file.input.size);
+          config.app.audio.data = new Uint8Array(config.app.audio.buffer);
+          config.app.element.info.audio.textContent = "File size: " + size;
+          config.app.element.output.textContent += "> The " + config.app.file.input.name + " (" + size + ") file is ready, please continue." + "\n";
+        }
+      },
+      "fileio": function () {
+        config.app.element.drop.audio.addEventListener("change", function (e) {
+          if (e.target) {
+            if (e.target.files) {
+              if (e.target.files.length && e.target.files[0]) {
+                const file = e.target.files[0];
+                /*  */
+                config.app.loader.start();
+                config.app.file.input = file;
+                config.app.file.reader.readAsArrayBuffer(config.app.file.input);
+                config.app.element.output.textContent += "> Reading the input file, please wait..." + "\n";
+              }
+            }
+          }
+        }, false);
+      }
+    },
+    "create": {
+      "output": {
+        "ext": null,
+        "blob": null,
+        "name": null,
+        "data": null,
+        "src": function () {
+          const name = config.app.file.output.name;
+          const data = config.app.file.output.data;
+          const ext = name.split('.').length ? name.split('.')[1] : null;
+          if (ext) {
+            config.app.create.output.ext = ext;
+            config.app.create.output.name = name;
+            config.app.create.output.data = data;
+            config.app.create.output.blob = new Blob([data], {"type": "audio/" + ext});
+            return URL.createObjectURL(config.app.create.output.blob);
+          }
+          /*  */
+          return null;
+        },
+        "player": function (display) {
+          config.app.element.preview.style.display = display;
+          if (config.app.element.preview.children[1]) {
+            config.app.element.preview.children[1].remove();
+          }
+          /*  */
+          if (display === "block" && config.app.file.output.name) {
+            const name = config.app.file.output.name;
+            if (name && name.match(/\.jpeg|\.gif|\.jpg|\.png|\.bmp|\.tiff|\.tif/)) {
+              const img = document.createElement("img");
+              config.app.element.preview.appendChild(img);
+            } else {
+              const audio = document.createElement("audio");
+              audio.setAttribute("controls", "controls");
+              audio.setAttribute("preload", "metadata");
+              config.app.element.preview.appendChild(audio);
+            }
+            /*  */
+            config.app.element.preview.children[1].src = config.app.audio.src;
+          }
+        }
+      }
+    },
+    "command": {
+      "clear": function () {
+        config.app.create.output.player("none");
+        config.app.element.output.textContent = '';
+        config.app.element.open.style.display = "none";
+        config.app.element.download.style.display = "none";
+      },
+      "parse": function (text) {
+        let args = [];
+        /*  */
+        text = text.replace(/\s+/g, ' ');
+        text.split('"').forEach(function(t, i) {
+          t = t.trim();
+          if ((i % 2) === 1) {
+            args.push(t);
+          } else {
+            args = args.concat(t.split(' '));
+          }
+        });
+        /*  */
+        return args;
+      },
+      "run": async function (command) {
+        if (config.app.worker.ready) {
+          if (config.app.running === false) {
+            config.app.loader.start();
+            config.app.command.clear();
+            /*  */
+            try {
+              if (config.app.file.input.name) {
+                if (command.indexOf("-i input") !== -1) {
+                  command = command.replace("input", config.app.file.input.name);
+                }
+              }
+              /*  */
+              const args = config.app.command.parse(command);
+              if (args && args.length) {
+                if (config.app.audio.data) {
+                  if (config.app.audio.data.byteLength) {
+                    if (command.indexOf(config.app.file.input.name) !== -1) {
+                      config.app.file.output.name = args[args.length - 1];
+                      await config.ffmpeg.core.writeFile(config.app.file.input.name, config.app.audio.data);
+                    }
+                  } else {
+                    config.app.file.reader.readAsArrayBuffer(config.app.file.input);
+                    config.app.element.output.textContent += "> Reading the input file, please wait..." + "\n";
+                    return;
+                  }
+                } else {
+                  config.app.loader.stop(2);
+                }
+                /*  */
+                config.ffmpeg.core.exec(args);
+              }
+            } catch (e) {
+              config.app.loader.stop(3);
+              config.app.element.run.textContent = "run";
+              config.app.element.output.textContent += "> An unexpected error happened!" + "\n";
+            }
+          }
+        }
+      }
+    },
+    "worker": {
+      "ready": false,
+      "init": async function () {
+        try {
+          config.app.element.output.textContent = "Audio Converter is getting ready, please wait...\n";
+          /*  */
+          await import(config.ffmpeg.URL.base + "ffmpeg.js");
+          config.ffmpeg.core = new FFmpegWASM.FFmpeg();
+          await config.ffmpeg.core.load({
+            "coreURL": config.ffmpeg.URL.core, 
+            "wasmURL": config.ffmpeg.URL.wasm
+          });
+          /*  */
+          config.app.loader.stop(4);
+          config.app.worker.ready = true;
+          config.app.element.output.textContent = "Audio Converter is ready!\n\nPlease type a command (i.e. -help) in the above field and then click on the - Run - button to start.\nAlternatively, you can click on a sample command above to insert one into the above input filed.\nThen, click on the - Run - button on the right side to execute your command.\nIf you want to clear the console, please click on the - Clear - button." + "\n\n";
+          /*  */
+          config.ffmpeg.core.on("log", function (e) {
+            if (e) {
+              let type = e.type;
+              let message = e.message;
+              let prefix = type === "stdout" ? "> " : "• ";
+              let aborted = message.indexOf("Aborted") !== -1;
+              /*  */
+              if (message) {
+                if (aborted) config.app.loader.stop(5);
+                config.app.element.output.textContent += (aborted ? ">> End" : prefix + message) + "\n";
+                if (config.prevent.scroll === false) {
+                  config.app.element.output.scrollTop = config.app.element.output.scrollHeight || 0;
+                }
+              }
+            }
+          });
+          /*  */
+          config.ffmpeg.core.on("progress", async function (e) {
+            if (e) {
+              if (e.progress === 1) {
+                config.app.loader.stop(5);
+                config.app.element.run.textContent = "run";
+                config.app.file.output.data = await config.ffmpeg.core.readFile(config.app.file.output.name);
+                if (config.app.file.output.data) {
+                  config.app.audio.src = config.app.create.output.src();
+                  if (config.app.audio.src) {
+                    config.app.element.open.style.display = "inline-block";
+                    config.app.element.download.style.display = "inline-block";
+                    await config.ffmpeg.core.deleteFile(config.app.file.input.name);
+                    await config.ffmpeg.core.deleteFile(config.app.file.output.name);
+                    /*  */
+                    window.setTimeout(function () {
+                      config.app.create.output.player("block");
+                    }, 300);
+                  }
+                }
+              } else {
+                config.app.element.run.textContent = e.progress < 1 ? Math.floor(e.progress * 100) + '%' : "•••";
+              }
+            }
+          });
+        } catch (e) {
+          config.app.loader.stop(6);
+          config.app.element.run.textContent = "run";
+          config.app.element.output.textContent += "> An unexpected error happened!" + "\n";
+        }
+      }
+    }
   }
 };
 
 config.port.connect();
 
-window.addEventListener("load", config.load, false);
 document.addEventListener("drop", config.prevent.drop, true);
-window.addEventListener("resize", config.resize.method, false);
 document.addEventListener("dragover", config.prevent.drop, true);
+
+window.addEventListener("load", config.load, false);
+window.addEventListener("resize", config.resize.method, false);

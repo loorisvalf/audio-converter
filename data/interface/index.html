@@ -12,21 +12,21 @@
       <table>
         <tr>
           <td id="reload" title="Reload interface">
-            <svg width="10" height="10" viewBox="0 0 512 512">
+            <svg width="11" height="11" viewBox="0 0 512 512">
               <path d="M281.525,228.102l104.758-78.042 c12.082-12.085,12.082-24.259,0-36.342L281.525,35.674c-3.274-2.359-7.359-3.725-11.723-3.725c-10.992,0-19.803,8.536-19.803,19.083  v35.429C144.611,86.737,59.205,172.046,59.205,277.258c0,105.396,85.672,190.793,191.248,190.793 c98.03,0,178.809-73.498,189.977-168.169c0.092-0.275,0.367-3.187,0.367-4.455c0-9.992-8.181-18.169-18.261-18.169h-45.793 c-14.993,0-26.349,10.355-27.893,18.986c-8.811,46.156-49.519,80.954-98.397,80.954c-55.329,0-100.127-44.701-100.127-99.94 c0-55.064,44.523-99.667,99.674-99.941v35.437c0,10.541,8.811,19.076,19.803,19.076C274.166,231.83,278.251,230.471,281.525,228.102 z"/>
             </svg>        
           </td>
         </tr>
         <tr>
           <td id="support" title="Open support page">
-            <svg width="10" height="10" viewBox="0 0 1792 1792">
+            <svg width="11" height="11" viewBox="0 0 1792 1792">
               <path d="M1088 1256v240q0 16-12 28t-28 12h-240q-16 0-28-12t-12-28v-240q0-16 12-28t28-12h240q16 0 28 12t12 28zm316-600q0 54-15.5 101t-35 76.5-55 59.5-57.5 43.5-61 35.5q-41 23-68.5 65t-27.5 67q0 17-12 32.5t-28 15.5h-240q-15 0-25.5-18.5t-10.5-37.5v-45q0-83 65-156.5t143-108.5q59-27 84-56t25-76q0-42-46.5-74t-107.5-32q-65 0-108 29-35 25-107 115-13 16-31 16-12 0-25-8l-164-125q-13-10-15.5-25t5.5-28q160-266 464-266 80 0 161 31t146 83 106 127.5 41 158.5z"/>
             </svg>            
           </td>
         </tr>
         <tr>
           <td id="donation" title="Make a donation">
-            <svg width="10" height="10" viewBox="-0.709 -11.555 141.732 141.732">
+            <svg width="11" height="11" viewBox="-0.709 -11.555 141.732 141.732">
               <path d="M140.314,37.654C140.314,16.858,123.402,0,102.537,0c-13.744,0-25.77,7.317-32.379,18.255C63.549,7.317,51.521,0,37.777,0 C16.912,0,0,16.858,0,37.654c0,10.821,4.588,20.57,11.922,27.438h-0.01l54.084,51.584c0.992,1.188,2.48,1.945,4.148,1.945 c1.545,0,2.936-0.653,3.92-1.696l54.346-51.833h-0.016C135.729,58.225,140.314,48.476,140.314,37.654"/>
             </svg>
           </td>
@@ -41,21 +41,34 @@
       </div>
       <div id="terminal">
         <button class="button action" data-command="-help">Help</button>
-        <button class="button action" data-command="-codecs">Codecs</button>
+        <button class="button action" data-command="-codecs">Codec</button>
+        <button class="button separator"></button>
         <button class="button action" data-command="-i input -acodec libmp3lame output.mp3" title="Conver input audio file to output.mp3">MP3</button>
         <button class="button action" data-command="-i input -acodec libfdk_aac output.acc" title="Conver input audio file to output.acc">ACC</button>
         <button class="button action" data-command="-i input -acodec libvorbis output.ogg" title="Conver input audio file to output.ogg">OGG</button>
         <button class="button action" data-command="-i input -acodec wmav1 output.wma" title="Conver input audio file to output.wma">WMA</button>
-        <button class="button clear">Clear</button>
+        <button class="button action" data-command="-i input -acodec ac3 output.ac3" title="Conver input audio file to output.ac3">AC3</button>
+        <button class="button action" data-command="-i input -acodec alac output.m4a" title="Conver input audio file to output.m4a">M4A</button>
+        <button class="button action" data-command="-i input -acodec pcm_s16le output.wav" title="Conver input audio file to output.wav">WAV</button>
+        <button class="button action" data-command="-i input -acodec flac output.flac" title="Conver input audio file to output.flac">FLAC</button>
+        <button class="button separator"></button>
+        <button class="button clear" title="Clear logs">
+          <svg width="16" height="16" viewBox="0 0 24 24">
+            <path d="m 22.4523,1.5229229 c 0.2929,0.2929 0.2929,0.76777 0,1.06066 l -6.313,6.31301 c -0.1466,-0.18055 -0.304,-0.35529 -0.4721,-0.52337 -0.1904,-0.19045 -0.3894,-0.36715 -0.5957,-0.53008 l 6.3202,-6.32022 c 0.2929,-0.29289 0.7677,-0.29289 1.0606,0 z"/>
+            <path d="m 20.861328,0.9921875 -6.916015,6.9160156 c 0.849891,0.5687903 1.499024,1.3227496 2.136718,2.1074219 l 6.900391,-6.9023437 c 0.579517,-0.5794971 0.579502,-1.5415916 0,-2.1210938 -0.577665,-0.57764423 -1.543436,-0.57763712 -2.121094,0 z"/>
+            <path d="M 14.0277,9.947533 C 11.7822,7.7020229 8.14151,7.7020229 5.896,9.947543 l -0.24403,0.24403 8.13173,8.13176 0.244,-0.2441 c 2.2455,-2.2455 2.2455,-5.8862 0,-8.1317 z"/>
+            <path d="m 0.88378,13.566133 3.61285,-2.4086 8.32107,8.3211 -2.4086,3.6128 c -0.2617,0.392761 -0.8208077,0.448002 -1.1543,0.1143 l -8.48532,-8.4853 c -0.33363705,-0.333469 -0.27851569,-0.892493 0.1143,-1.1543 z"/>
+          </svg>
+        </button>
+        <button class="button preview" title="Click to see preview">View</button>
         <button class="button run">Run</button>
-        <button class="button preview" title="Click to see preview">Preview</button>
         <button class="button download" title="Click to download the output media">
-          <svg width="10" height="10" viewBox="0 0 16 16">
+          <svg width="14" height="14" viewBox="0 0 16 16">
             <path d="M 7,15.375 2.54,10 C 2.287,9.695 2,9.461 2,9 2,8.375 2.516,8 3,8 H 6 V 1 C 6,0.45 6.45,0 7,0 H 9 C 9.55,0 10,0.45 10,1 V 8 H 13 C 13.484,8 14,8.375 14,9 14,9.461 13.713,9.695 13.46,10 L 9,15.375 C 8.688,15.758 8.445,16 8,16 7.555,16 7.313,15.758 7,15.375 Z"/>
           </svg>
         </button>
         <input id="input" value="-help">
-        <pre id="output">Audio Converter is getting ready, please wait...</pre>
+        <pre id="output"></pre>
       </div>
       <div id="preview" class="fade-in">
         <div title="Close">✕</div>

@@ -1,3 +1,11 @@
-This add-on is using the compiled version of FFmpeg library using Emscripten.
+This addon uses the following opensource libraries:
 
-ffmpeg-all-codecs.js: https://raw.githubusercontent.com/sopel39/audioconverter.js/master/site/js/ffmpeg.js
+FFmpeg WASM: https://ffmpegwasm.netlify.app/docs/overview
+
+umd v0.12.15:
+ffmpeg.js: https://unpkg.com/browse/@ffmpeg/ffmpeg@0.12.15/dist/umd/ffmpeg.js
+814.ffmpeg.js: https://unpkg.com/browse/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js
+
+umd v0.12.10:
+ffmpeg-core.js: https://unpkg.com/browse/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js
+ffmpeg-core.wasm: https://unpkg.com/browse/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.wasm

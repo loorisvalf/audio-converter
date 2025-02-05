@@ -4,7 +4,7 @@ body {
 	padding: 0;
 	width: 100%;
   color: #333;
-	font-size: 12px;
+	font-size: 13px;
 	font-family: monospace;
 }
 
@@ -35,7 +35,8 @@ body {
 }
 
 .toolbar table tr td svg {
-  fill: #777;
+  fill: #555;
+  margin-top: -2px;
   pointer-events: none;
   vertical-align: middle;
 }
@@ -53,12 +54,13 @@ body {
 .button {
   padding: 0;
   color: #333;
-  width: 78px;
+  width: 58px;
   height: 42px;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   margin: 5px auto;
   font-weight: 600;
+  user-select: none;
   letter-spacing: 1px;
   display: inline-block;
   text-decoration: none;
@@ -69,8 +71,27 @@ body {
   border: 1px solid rgba(0,0,0,0.1);
 }
 
+.button.clear {
+  width: 42px;
+}
+
+.button.separator {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  padding: 0;
+  width: 1px;
+  cursor: default;
+  letter-spacing: 0;
+  background-color: rgba(0,0,0,0.25);
+}
+
+.button.separator:hover {
+  background-color: rgba(0,0,0,0.25);
+}
+
 .button svg {
-  fill: #777;
+  fill: #555;
   pointer-events: none;
   vertical-align: middle;
 }
@@ -84,8 +105,10 @@ body {
 }
 
 .download {
+  float: right;
   display: none;
-  border-color: #777;
+  margin-right: 5px;
+  border-color: #555;
 }
 
 .download svg {
@@ -93,11 +116,12 @@ body {
 }
 
 .run {
+  width: 98px;
   float: right;
-  width: 128px;
   color: #518ff5;
+  font-size: 15px;
   font-weight: bold;
-  border-color: #777;
+  border-color: #555;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
@@ -123,7 +147,7 @@ body {
   width: 100%;
   height: 42px;
   outline: none;
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 5px;
   font-weight: 600;
   text-indent: 10px;
@@ -134,19 +158,18 @@ body {
 }
 
 #loader {
-  top: 62px;
+  top: 58px;
   border: 0;
   padding: 0;
-  left: 10px;
+  left: 15px;
   margin: 0 auto;
   position: fixed;
   text-align: center;
-  transform: rotate(90deg);
   background-color: transparent;
 }
 
 #loader svg {
-  fill: #777;
+  fill: #555;
   margin: 0 auto;
   vertical-align: middle;
 }
@@ -180,18 +203,33 @@ body {
   width: calc(100vw - 100px);
 }
 
+#preview img {
+  height: auto;
+  margin: auto;
+  margin-top: 10vh;
+  max-width: 600px;
+  max-height: 400px;
+  vertical-align: middle;
+  width: calc(100% - 10px);
+}
+
 #preview div {
   width: 100%;
   color: #fff;
   height: 42px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   text-align: left;
   font-weight: 600;
   text-indent: 20px;
   line-height: 44px;
   font-family: monospace;
-  background: rgba(0,0,0,0.75);
+  background-color: rgba(0,0,0,0.75);
+  transition: 300ms ease background-color;
+}
+
+#preview div:hover {
+  background-color: rgba(0,0,0,0.95);
 }
 
 #audio-dropbox {
@@ -212,7 +250,7 @@ body {
   padding: 0;
   color: #555;
   bottom: 10px;
-  font-size: 12px;
+  font-size: 13px;
   text-align: center;
   position: absolute;
 }
@@ -237,7 +275,7 @@ body {
   height: 100%;
   padding: 10px;
   outline: none;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
   font-weight: 600;
   position: absolute;
@@ -247,12 +285,12 @@ body {
 }
 
 #audio-fileinfo {
-  top: 2px;
-  right: 0;
+  left: 10px;
+  padding: 0;
   width: auto;
-  color: #777;
-  padding: 0 5px;
-  font-size: 12px;
+  color: #555;
+  bottom: 32px;
+  font-size: 13px;
   text-align: right;
   position: absolute;
   font-family: monospace;
@@ -264,7 +302,7 @@ body {
   color: #333;
   padding: 10px;
   margin: 0 auto;
-  font-size: 12px;
+  font-size: 13px;
   margin-top: 10px;
   text-align: left;
   line-height: 22px;
@@ -293,9 +331,29 @@ body {
 }
 
 @media (max-width: 500px) {
-  .run {float: none}
-  .button {width: 100%}
+  .run, .download {
+    float: none;
+    margin-right: auto;
+  }
+  .button, .button.clear {
+    width: 100%;
+    height: 38px;
+    margin: 3px auto;
+  }
+  #audio-fileinfo {
+    bottom: 10px;
+  }
+  #audio-dropbox {
+    background-position-y: 70%;
+  }
+  .button.separator,
   #audio-dropbox span {
+    display: none;
+  }
+}
+
+@media (max-width: 300px) {
+  .toolbar {
     display: none;
   }
 }
